@@ -13,7 +13,7 @@ class DBConnection(object):
 
     def write(self, query):
         with self._driver.session() as session:
-            return session.write_transaction(self._create_query, query)
+            session.write_transaction(self._create_query, query)
 
     def read(self, query):
         with self._driver.session() as session:
@@ -27,7 +27,7 @@ class DBConnection(object):
     @staticmethod
     def _create_query(tx, query):
         result = tx.run(query)
-        return result.single()[0]
+        return result
 
     @staticmethod
     def _create_and_return_greeting(tx, message):
@@ -40,11 +40,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--uri', default='bolt://localhost:7687', help='The connection URI',)
     parser.add_argument('-u', '--user', default='neo4j', help='Username')
-    parser.add_argument("-p", '--password', required=True, help='Password')
+    parser.add_argument('-p', '--password', required=True, help='Password')
 
     args, _ = parser.parse_known_args()
 
     con = DBConnection(uri=args.uri, user=args.user, password=args.password)
-    print(con.test_connection_with_message("hello world"))
+    print(con.test_connection_with_message('hello world'))
 
     con.close()
