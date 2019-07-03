@@ -11,10 +11,23 @@ class DBConnection(object):
     def close(self):
         self._driver.close()
 
+    def write(self, query):
+        with self._driver.session() as session:
+            return session.write_transaction(self._create_query, query)
+
+    def read(self, query):
+        with self._driver.session() as session:
+            return session.read_transaction(self._create_query, query)
+
     def test_connection_with_message(self, message):
         with self._driver.session() as session:
             greeting = session.write_transaction(self._create_and_return_greeting, message)
         return greeting
+
+    @staticmethod
+    def _create_query(tx, query):
+        result = tx.run(query)
+        return result.single()[0]
 
     @staticmethod
     def _create_and_return_greeting(tx, message):
@@ -33,4 +46,5 @@ if __name__ == "__main__":
 
     con = DBConnection(uri=args.uri, user=args.user, password=args.password)
     print(con.test_connection_with_message("hello world"))
+
     con.close()
