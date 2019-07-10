@@ -13,7 +13,7 @@ class DBConnection(object):
 
     def write(self, query):
         with self._driver.session() as session:
-            session.write_transaction(self._create_query, query)
+            session.run(query)
 
     def read(self, query):
         with self._driver.session() as session:
